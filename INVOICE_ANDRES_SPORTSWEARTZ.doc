@@ -1,0 +1,53 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss\fcharset0 Calibri;}{\f1\fswiss\fcharset0 Arial;}}
+{\colortbl ;\red15\green23\blue42;\red16\green185\blue129;\red100\green116\blue139;\red241\green245\blue249;}
+\viewkind4\uc1\pard\f0\fs28\b INVOICE & QUOTATION\par
+\fs22\b0 Andres Sportsweartz E-Commerce Website Project\par
+\fs18\cf3 Document: AWS-2026-001 | Date: 25 September 2026\cf0\par
+\line
+\fs20\b Prepared by:\b0  WalkTech Web Development\par
+\b Prepared for:\b0  Andres Sportsweartz (Tanzania)\par
+\b Status:\b0  Completed / Live Launch\par
+\b Total Amount:\b0  \b 900,000 TZS\b0  (Tanzanian Shillings)\par
+\line
+\fs22\b SCOPE OF WORK & DELIVERABLES (22 DELIVERABLES)\b0\fs18\par
+\par
+\b Phase 1: Frontend Website & Catalogue (350,000 TZS)\b0\par
+- Responsive Next.js 16 storefront with category filters and product search\par
+- Persistent shopping cart with size and quantity selection\par
+- Interactive checkout form with live validation\par
+- One-tap WhatsApp direct order routing with dynamic cart summary\par
+- Full mobile-first responsive layout (smartphones, tablets, desktop)\par
+\par
+\b Phase 2: Backend, Database & Storage (200,000 TZS)\b0\par
+- Supabase PostgreSQL database architecture with 4 normalized tables\par
+- Server-side price enforcement preventing client-side tamper attempts\par
+- Anti-spam honeypot and in-memory rate limiting (5 submissions / 10 mins)\par
+- Product image asset bucket configured on Supabase Storage\par
+\par
+\b Phase 3: Admin Management Dashboard (200,000 TZS)\b0\par
+- Secure admin authentication system with credential validation\par
+- Live sales analytics, total orders counter, and revenue overview\par
+- Inventory catalog management (add, edit, hide, and delete items)\par
+- Order management portal with customer contact details and delivery status\par
+\par
+\b Phase 4: Production Polish & Security (75,000 TZS)\b0\par
+- Rigorous TypeScript types and zero-error code standards\par
+- Structured server-side error capturing with sanitized client alerts\par
+- Production-optimized Next.js build bundle\par
+\par
+\b Deployment & Handoff (75,000 TZS)\b0\par
+- GitHub source repository configured and pushed\par
+- Vercel cloud deployment with global CDN and edge routing\par
+- Complete documentation: README guide, database schema, invoice\par
+\line
+\fs22\b PAYMENT SUMMARY\b0\fs20\par
+Subtotal: 900,000 TZS\par
+Discount: 0 TZS\par
+\b Total Due: 900,000 TZS\b0\par
+\line
+\fs18\cf3 Payment Method: Mobile Money (M-Pesa / Tigo Pesa / Airtel Money) or Bank Transfer\par
+Source Code: https://github.com/walktech03-star/andres-sportsweartz\cf0\par
+\line\line
+\fs18 Prepared by: WalkTech                                 Approved by: Andres Sportsweartz\par
+Date: 25/09/2026                                      Date: ____/____/2026\par
+}
