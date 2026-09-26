@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { useCart } from "@/components/cart-provider";
 import { ProductArtwork } from "@/components/product-artwork";
 import { formatPrice } from "@/lib/products";
@@ -11,9 +12,7 @@ export default function CartPage() {
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-6">
-        <Link href="/" className="text-xl font-black tracking-tighter">
-          ANDRES <span className="text-[#ff6b2c]">SPORTSWEARTZ</span>
-        </Link>
+        <BrandLogo href="/" />
         <Link href="/shop" className="text-sm font-bold text-[#1769e0]">
           Continue shopping
         </Link>

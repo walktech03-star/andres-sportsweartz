@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { whatsappLink } from "@/lib/business";
 import { ProductArtwork } from "@/components/product-artwork";
 import { formatPrice } from "@/lib/products";
@@ -88,7 +89,14 @@ export default function ConfirmationPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
-      <section className="mx-auto max-w-2xl px-5 py-16">
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6">
+        <BrandLogo href="/" />
+        <Link href="/shop" className="text-sm font-bold text-[#1769e0]">
+          Continue shopping
+        </Link>
+      </header>
+
+      <section className="mx-auto max-w-2xl px-5 pb-16 pt-8">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-xs font-black text-white">
             DONE

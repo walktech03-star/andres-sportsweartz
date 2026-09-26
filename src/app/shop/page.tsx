@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { CartLink } from "@/components/cart-link";
 import { ShopBrowser } from "@/components/shop-browser";
 import { getPublishedProducts } from "@/lib/product-repository";
@@ -21,10 +22,7 @@ export default async function ShopPage() {
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 lg:px-8">
-        <Link href="/" className="leading-none">
-          <b className="block text-xl tracking-tighter">ANDRES</b>
-          <span className="text-[10px] font-bold tracking-[.25em] text-[#ff6b2c]">SPORTSWEARTZ</span>
-        </Link>
+        <BrandLogo href="/" />
         <div className="flex items-center gap-4">
           <Link href="/" className="text-sm font-bold text-[#1769e0]">
             Back home

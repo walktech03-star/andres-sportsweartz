@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { CartLink } from "@/components/cart-link";
 import { ProductArtwork } from "@/components/product-artwork";
 import { business, whatsappLink } from "@/lib/business";
@@ -54,10 +55,7 @@ export default async function Home() {
       </div>
 
       <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-        <Link href="/" className="leading-none">
-          <b className="block text-xl tracking-tighter">ANDRES</b>
-          <span className="text-[10px] font-bold tracking-[.25em] text-[#ff6b2c]">SPORTSWEARTZ</span>
-        </Link>
+        <BrandLogo href="/" />
 
         <nav className="hidden gap-8 text-sm font-bold text-slate-600 md:flex">
           <Link href="/shop" className="hover:text-[#ff6b2c]">Shop</Link>

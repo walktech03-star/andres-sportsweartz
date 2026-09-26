@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/admin/actions";
+import { BrandLogo } from "@/components/brand-logo";
 import { requireAdmin } from "@/lib/admin";
 import { business } from "@/lib/business";
 
@@ -19,10 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-          <Link href="/admin" className="leading-none">
-            <b className="block text-lg tracking-tighter">ANDRES</b>
-            <span className="text-[9px] font-bold tracking-[.25em] text-[#ff6b2c]">ADMIN</span>
-          </Link>
+          <BrandLogo href="/admin" size="sm" subtitle="ADMIN" />
 
           <nav className="flex flex-wrap gap-1 text-sm font-bold">
             {links.map((link) => (

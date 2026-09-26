@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { useCart } from "@/components/cart-provider";
 import { formatPrice } from "@/lib/products";
 
@@ -115,9 +116,7 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6">
-        <Link href="/" className="text-xl font-black tracking-tighter">
-          ANDRES <span className="text-[#ff6b2c]">SPORTSWEARTZ</span>
-        </Link>
+        <BrandLogo href="/" />
         <Link href="/cart" className="text-sm font-bold text-[#1769e0]">
           Back to bag
         </Link>

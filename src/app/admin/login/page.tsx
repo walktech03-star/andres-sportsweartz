@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signIn } from "@/app/admin/actions";
+import { BrandLogo } from "@/components/brand-logo";
 import { business } from "@/lib/business";
 
 // The admin login page. It is deliberately plain, large-button and easy to use
@@ -23,10 +24,9 @@ export default async function AdminLoginPage({
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f8fa] px-5 py-12">
       <div className="w-full max-w-md">
-        <Link href="/" className="mb-8 block text-center leading-none">
-          <b className="block text-xl tracking-tighter">ANDRES</b>
-          <span className="text-[10px] font-bold tracking-[.25em] text-[#ff6b2c]">SPORTSWEARTZ</span>
-        </Link>
+        <div className="mb-8 flex justify-center">
+          <BrandLogo href="/" />
+        </div>
 
         <div className="rounded-2xl bg-white p-7 shadow-sm">
           <h1 className="display-font text-3xl font-black">Staff sign in</h1>
