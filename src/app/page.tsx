@@ -173,6 +173,9 @@ export default async function Home() {
         <span>
           (c) {new Date().getFullYear()} {business.name}. Built to move.
         </span>
+        <Link href="/admin/login" className="text-xs font-bold text-slate-400 hover:text-[#1769e0]">
+          Staff
+        </Link>
       </footer>
     </main>
   );
