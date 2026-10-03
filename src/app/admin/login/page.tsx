@@ -19,7 +19,9 @@ export default async function AdminLoginPage({
         ? "That email address and password did not match. Please try again."
         : error === "not_allowed"
           ? "This account is signed in, but it is not on the staff allow list. Please ask the owner to add it."
-          : null;
+          : error === "rate_limited"
+            ? "Too many sign-in attempts from this connection. Please wait a few minutes and try again."
+            : null;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f8fa] px-5 py-12">

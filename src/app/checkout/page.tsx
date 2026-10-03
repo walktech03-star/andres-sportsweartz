@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { useCart } from "@/components/cart-provider";
 import { formatPrice } from "@/lib/products";
@@ -28,17 +28,19 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<string[]>([]);
-  const [campaignCode, setCampaignCode] = useState<string | null>(null);
 
-  // Attribute the order to the QR flyer that brought the customer, if any.
-  useEffect(() => {
+  // Read the QR flyer cookie once, right when the order is submitted. The
+  // /r/:code route set it before this page opened, so it is stable by now.
+  // No state or effect is needed for a value that never changes here.
+  const readCampaignCode = (): string | null => {
     try {
       const match = document.cookie.match(/(?:^|;\s*)qr_campaign=([^;]*)/);
-      if (match) setCampaignCode(decodeURIComponent(match[1]).slice(0, 80) || null);
+      if (!match) return null;
+      return decodeURIComponent(match[1]).slice(0, 80) || null;
     } catch {
-      // Cookies unavailable - order simply has no campaign.
+      return null;
     }
-  }, []);
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,7 +65,7 @@ export default function CheckoutPage() {
       address: data.get("address"),
       notes: data.get("notes"),
       website: data.get("website"),
-      campaignCode,
+      campaignCode: readCampaignCode(),
       items: items.map((item) => ({
         slug: item.product.slug,
         size: item.size,

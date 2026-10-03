@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createQrCampaign, deleteQrCampaign, toggleQrCampaign } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -23,6 +24,16 @@ type CampaignRow = {
 const input = "mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-[#1769e0]";
 const label = "block text-sm font-bold";
 
+// Plain helper (not a component) so time is read per request, which is correct
+// for this force-dynamic server page that always renders fresh analytics.
+function recentIsoBounds() {
+  const now = Date.now();
+  return {
+    since7: new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    since30: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+}
+
 export default async function QrCampaignsPage({
   searchParams,
 }: {
@@ -34,10 +45,10 @@ export default async function QrCampaignsPage({
   const products = await getPublishedProducts();
 
   let campaigns: CampaignRow[] = [];
-  let scansLast7: Record<string, number> = {};
-  let scansLast30: Record<string, number> = {};
+  const scansLast7: Record<string, number> = {};
+  const scansLast30: Record<string, number> = {};
   let totalScans = 0;
-  let ordersByCampaign: Record<string, { count: number; revenue: number }> = {};
+  const ordersByCampaign: Record<string, { count: number; revenue: number }> = {};
   let dbReady = true;
 
   if (supabase) {
@@ -48,8 +59,7 @@ export default async function QrCampaignsPage({
       .limit(200);
     campaigns = (data ?? []) as CampaignRow[];
 
-    const since7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { since7, since30 } = recentIsoBounds();
 
     const scans7 = await supabase.from("qr_scans").select("campaign_code").gte("created_at", since7).limit(5000);
     if (!scans7.error && scans7.data) {
@@ -289,12 +299,11 @@ export default async function QrCampaignsPage({
                 <div key={p.slug} className="rounded-xl bg-slate-50 p-3 text-center">
                   <p className="text-sm font-black">{p.name}</p>
                   <p className="font-mono text-[11px] text-slate-500">/r/{code}</p>
-                  <img
+                  <Image
                     src={qrImageUrl(landing, 140)}
                     alt={`QR for ${p.name}`}
                     width={140}
                     height={140}
-                    loading="lazy"
                     className="mx-auto mt-2 h-[140px] w-[140px] rounded-lg bg-white p-1"
                   />
                   <Link href={`/products/${p.slug}`} className="mt-2 inline-block text-xs font-bold text-[#1769e0]">

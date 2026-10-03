@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { qrImageUrl, qrLandingUrl, segmentLabel } from "@/lib/qr-campaigns";
 
 export type QrCardData = {
@@ -35,12 +36,11 @@ export function QrCard({ item }: { item: QrCardData }) {
       </div>
 
       <div className="flex flex-col items-center gap-3 bg-slate-50 p-5">
-        <img
+        <Image
           src={image}
           alt={`QR code for ${item.name} - ANDRES SPORTSWEARTZ`}
           width={220}
           height={220}
-          loading="lazy"
           className="h-[220px] w-[220px] rounded-xl bg-white p-2 shadow-sm"
         />
         <p className="break-all text-center font-mono text-[11px] text-slate-500">{landing}</p>

@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentAdmin } from "@/lib/admin";
+import { rateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -62,7 +64,35 @@ function parseSizes(value: string) {
     });
 }
 
+// Stricter than the public order endpoint, but generous enough that a real
+// admin mistyping a password is never locked out: only sustained guessing is
+// slowed down, and Supabase Auth still applies its own protections on top.
+const SIGN_IN_MAX_ATTEMPTS = 20;
+const SIGN_IN_WINDOW_MS = 10 * 60 * 1000;
+
+async function signInClientKey(): Promise<string> {
+  // Best effort: prefer the real client IP behind Vercel's proxy headers.
+  // Falls back to a shared bucket rather than crashing the login flow.
+  try {
+    const store = await headers();
+    const forwardedFor = store.get("x-forwarded-for");
+    if (forwardedFor) {
+      const first = forwardedFor.split(",")[0]?.trim();
+      if (first) return first;
+    }
+    return store.get("x-real-ip") ?? "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 export async function signIn(formData: FormData) {
+  // Count every sign-in attempt (valid or not) so credential guessing from one
+  // connection is throttled. Successful logins are NOT exempted, because that
+  // would let an attacker probe which emails exist for free.
+  const limit = rateLimit("admin-signin:" + (await signInClientKey()), SIGN_IN_MAX_ATTEMPTS, SIGN_IN_WINDOW_MS);
+  if (!limit.allowed) redirect("/admin/login?error=rate_limited");
+
   const email = text(formData, "email", 200);
   const password = text(formData, "password", 200);
 
