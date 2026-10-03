@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { BulkOffersBanner } from "@/components/bulk-offers-banner";
 import { CartLink } from "@/components/cart-link";
 import { ProductArtwork } from "@/components/product-artwork";
 import { business, whatsappLink } from "@/lib/business";
@@ -148,10 +149,19 @@ export default async function Home() {
           <p className="text-xs font-black uppercase tracking-[0.2em]">Why Andres</p>
           <h2 className="display-font mt-4 text-4xl font-black">Gear for the work you put in.</h2>
           <p className="mt-5 max-w-md leading-7 text-orange-50">
-            Reliable sportswear for people who show up and keep going.
+            Reliable sportswear for people who show up and keep going. Schools, academies
+            and teams save up to 15% with automatic bulk discounts.
           </p>
+          <Link
+            href="/shop"
+            className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-black text-[#ff6b2c]"
+          >
+            See bulk offers
+          </Link>
         </div>
       </section>
+
+      <BulkOffersBanner />
 
       <section id="contact" className="bg-[#10233f] px-5 py-12 text-center text-white">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-[#ff8a5c]">Need a hand?</p>

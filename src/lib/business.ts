@@ -11,6 +11,7 @@ export const business = {
   name: process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Andres Sportsweartz",
   shortName: "Andres",
   tagline: "Move with confidence.",
+  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://andres-sportsweartz.vercel.app").replace(/\/+$/, ""),
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "255627546360",
   phoneNumber: process.env.NEXT_PUBLIC_PHONE_NUMBER ?? "",
   currency: process.env.NEXT_PUBLIC_CURRENCY ?? "TZS",

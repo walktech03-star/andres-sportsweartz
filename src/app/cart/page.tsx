@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { BulkOffersBanner } from "@/components/bulk-offers-banner";
 import { useCart } from "@/components/cart-provider";
 import { ProductArtwork } from "@/components/product-artwork";
 import { formatPrice } from "@/lib/products";
 
 export default function CartPage() {
-  const { items, total, update, remove } = useCart();
+  const { items, total, subtotal, discount, discountRate, count, update, remove } = useCart();
 
   return (
     <main className="min-h-screen bg-[#f7f8fa] text-[#10233f]">
@@ -63,7 +64,21 @@ export default function CartPage() {
 
             <div className="mt-8 rounded-2xl bg-[#10233f] p-6 text-white">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>Subtotal ({count} {count === 1 ? "item" : "items"})</span>
+                <b>{formatPrice(subtotal)}</b>
+              </div>
+              {discount > 0 ? (
+                <div className="mt-2 flex justify-between text-[#7CFC9A]">
+                  <span>Bulk discount ({Math.round(discountRate * 100)}% off)</span>
+                  <b>-{formatPrice(discount)}</b>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-slate-300">
+                  Add {10 - count > 0 ? 10 - count : 0} more {10 - count === 1 ? "item" : "items"} to unlock 5% off your whole bag.
+                </p>
+              )}
+              <div className="mt-3 flex justify-between border-t border-white/20 pt-4 text-lg">
+                <span>Total</span>
                 <b>{formatPrice(total)}</b>
               </div>
               <p className="mt-2 text-xs text-slate-300">Delivery details will be confirmed with you.</p>
@@ -74,6 +89,8 @@ export default function CartPage() {
           </>
         )}
       </section>
+
+      <BulkOffersBanner compact />
     </main>
   );
 }

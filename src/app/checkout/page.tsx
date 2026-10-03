@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { useCart } from "@/components/cart-provider";
 import { formatPrice } from "@/lib/products";
@@ -12,6 +12,9 @@ type OrderResponse = {
   persisted?: boolean;
   reference?: string;
   subtotal?: number;
+  discountRate?: number;
+  discountAmount?: number;
+  itemCount?: number;
   deliveryFee?: number;
   total?: number;
   currency?: string;
@@ -21,10 +24,21 @@ type OrderResponse = {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total, clear } = useCart();
+  const { items, total, subtotal, discount, discountRate, count, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<string[]>([]);
+  const [campaignCode, setCampaignCode] = useState<string | null>(null);
+
+  // Attribute the order to the QR flyer that brought the customer, if any.
+  useEffect(() => {
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)qr_campaign=([^;]*)/);
+      if (match) setCampaignCode(decodeURIComponent(match[1]).slice(0, 80) || null);
+    } catch {
+      // Cookies unavailable - order simply has no campaign.
+    }
+  }, []);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,8 +53,9 @@ export default function CheckoutPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
 
-    // Only the information the server needs. Notice that NO PRICE is sent.
-    // The server looks up the real price itself, so it cannot be tampered with.
+    // Only the information the server needs. Notice that NO PRICE and NO
+    // DISCOUNT is sent. The server looks up real prices and recomputes the
+    // bulk discount itself, so neither can be tampered with.
     const payload = {
       name: data.get("name"),
       phone: data.get("phone"),
@@ -48,6 +63,7 @@ export default function CheckoutPage() {
       address: data.get("address"),
       notes: data.get("notes"),
       website: data.get("website"),
+      campaignCode,
       items: items.map((item) => ({
         slug: item.product.slug,
         size: item.size,
@@ -98,6 +114,10 @@ export default function CheckoutPage() {
               accentColor: item.product.accentColor,
               imageUrl: item.product.imageUrl,
             })),
+            subtotal: result.subtotal ?? subtotal,
+            discountRate: result.discountRate ?? discountRate,
+            discountAmount: result.discountAmount ?? discount,
+            itemCount: result.itemCount ?? count,
           })
         );
       } catch {
@@ -181,6 +201,11 @@ export default function CheckoutPage() {
 
         <aside className="h-fit rounded-2xl bg-[#10233f] p-6 text-white">
           <h2 className="font-black">Order summary</h2>
+          {discount > 0 && (
+            <p className="mt-2 inline-block rounded-full bg-[#7CFC9A]/20 px-3 py-1 text-xs font-black text-[#7CFC9A]">
+              Bulk offer: {Math.round(discountRate * 100)}% off applied
+            </p>
+          )}
           {items.length === 0 && <p className="mt-4 text-sm text-slate-300">No products selected yet.</p>}
           {items.map((item) => (
             <div key={item.key} className="mt-4 flex justify-between gap-4 text-sm">
@@ -191,9 +216,21 @@ export default function CheckoutPage() {
               <b className="whitespace-nowrap">{formatPrice(item.product.price * item.quantity)}</b>
             </div>
           ))}
-          <div className="mt-6 flex justify-between border-t border-white/20 pt-5">
-            <span>Total</span>
-            <b>{formatPrice(total)}</b>
+          <div className="mt-6 space-y-2 border-t border-white/20 pt-5 text-sm">
+            <div className="flex justify-between">
+              <span>Subtotal ({count} {count === 1 ? "item" : "items"})</span>
+              <span>{formatPrice(subtotal)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-[#7CFC9A]">
+                <span>Bulk discount ({Math.round(discountRate * 100)}%)</span>
+                <span>-{formatPrice(discount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between pt-1 text-base font-black">
+              <span>Total</span>
+              <b>{formatPrice(total)}</b>
+            </div>
           </div>
           <p className="mt-4 text-xs leading-5 text-slate-300">
             Payment is arranged after we confirm your order. We will contact you using the phone number provided.

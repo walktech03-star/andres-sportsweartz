@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
+import { summarizeDiscount } from "@/lib/bulk-discounts";
 import type { Product } from "@/lib/products";
 
 export type CartItem = { key: string; product: Product; size: string; quantity: number };
@@ -12,6 +13,9 @@ type CartContext = {
   update: (key: string, quantity: number) => void;
   clear: () => void;
   total: number;
+  subtotal: number;
+  discount: number;
+  discountRate: number;
   count: number;
 };
 
@@ -76,22 +80,28 @@ const Context = createContext<CartContext | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const { rate, discount, total } = summarizeDiscount(subtotal, count);
   const value = useMemo<CartContext>(() => ({
     items,
     add: (product, size, quantity = 1) => commit((current) => {
       const key = `${product.slug}-${size}`;
       const existing = current.find((item) => item.key === key);
       if (existing) {
-        return current.map((item) => item.key === key ? { ...item, quantity: item.quantity + quantity } : item);
+        return current.map((item) => item.key === key ? { ...item, quantity: Math.min(100, item.quantity + quantity) } : item);
       }
-      return [...current, { key, product, size, quantity }];
+      return [...current, { key, product, size, quantity: Math.min(100, Math.max(1, quantity)) }];
     }),
     remove: (key) => commit((current) => current.filter((item) => item.key !== key)),
-    update: (key, quantity) => commit((current) => quantity < 1 ? current.filter((item) => item.key !== key) : current.map((item) => item.key === key ? { ...item, quantity } : item)),
+    update: (key, quantity) => commit((current) => quantity < 1 ? current.filter((item) => item.key !== key) : current.map((item) => item.key === key ? { ...item, quantity: Math.min(100, quantity) } : item)),
     clear: () => commit(() => []),
-    total: items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
-    count: items.reduce((sum, item) => sum + item.quantity, 0),
-  }), [items]);
+    total,
+    subtotal,
+    discount,
+    discountRate: rate,
+    count,
+  }), [items, total, subtotal, discount, rate, count]);
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 

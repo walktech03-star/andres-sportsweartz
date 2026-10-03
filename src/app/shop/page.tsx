@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { BulkOffersBanner } from "@/components/bulk-offers-banner";
 import { CartLink } from "@/components/cart-link";
 import { ShopBrowser } from "@/components/shop-browser";
 import { getPublishedProducts } from "@/lib/product-repository";
@@ -32,6 +33,10 @@ export default async function ShopPage() {
       </header>
 
       <ShopBrowser products={products} categories={categories} />
+
+      <div className="pb-4">
+        <BulkOffersBanner compact />
+      </div>
     </main>
   );
 }

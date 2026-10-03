@@ -1,4 +1,5 @@
 import { business } from "@/lib/business";
+import { getDiscountRate } from "@/lib/bulk-discounts";
 import type { Product } from "@/lib/products";
 
 // =============================================================================
@@ -13,8 +14,8 @@ import type { Product } from "@/lib/products";
 // every amount ourselves.
 // =============================================================================
 
-export const MAX_ITEMS_PER_ORDER = 30;
-export const MAX_QUANTITY_PER_ITEM = 20;
+export const MAX_ITEMS_PER_ORDER = 60;
+export const MAX_QUANTITY_PER_ITEM = 100;
 
 export type ValidatedItem = {
   slug: string;
@@ -31,7 +32,11 @@ export type ValidatedOrder = {
   location: string;
   address: string;
   notes: string | null;
+  campaignCode: string | null;
   items: ValidatedItem[];
+  itemCount: number;
+  discountRate: number;
+  discountAmount: number;
   subtotal: number;
   deliveryFee: number;
   total: number;
@@ -154,6 +159,16 @@ export function validateOrderPayload(payload: unknown, catalogue: Product[]): Va
   }
 
   const subtotal = roundMoney(items.reduce((sum, item) => sum + item.lineTotal, 0));
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Quantity-based offer. The rate is derived ONLY from the validated item
+  // count, never from a browser-supplied discount value.
+  const discountRate = getDiscountRate(itemCount);
+  const discountAmount = Math.round(subtotal * discountRate);
+  const discountedSubtotal = roundMoney(subtotal - discountAmount);
+
+  const rawCampaign = asText((body as Record<string, unknown>).campaignCode);
+  const campaignCode = /^[a-z0-9-]{1,80}$/i.test(rawCampaign) ? rawCampaign : null;
 
   // Delivery fee. Currently free delivery is assumed.
   // When the owner starts charging for delivery, change this single line.
@@ -167,10 +182,14 @@ export function validateOrderPayload(payload: unknown, catalogue: Product[]): Va
       location,
       address,
       notes,
+      campaignCode,
       items,
+      itemCount,
+      discountRate,
+      discountAmount,
       subtotal,
       deliveryFee,
-      total: roundMoney(subtotal + deliveryFee),
+      total: roundMoney(discountedSubtotal + deliveryFee),
       currency: business.currency,
     },
   };

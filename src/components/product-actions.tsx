@@ -29,7 +29,7 @@ export function ProductActions({ product }: { product: Product }) {
   };
 
   const changeQuantity = (value: number) => {
-    setQuantity(Math.min(20, Math.max(1, value)));
+    setQuantity(Math.min(100, Math.max(1, value)));
     setAdded(false);
   };
 

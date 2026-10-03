@@ -12,6 +12,10 @@ type SavedOrder = {
   persisted: boolean;
   message: string;
   total: number;
+  subtotal?: number;
+  discountRate?: number;
+  discountAmount?: number;
+  itemCount?: number;
   currency: string;
   name: string;
   phone: string;
@@ -73,6 +77,13 @@ export default function ConfirmationPage() {
       );
     });
 
+    if (order.subtotal != null) {
+      lines.push("Subtotal (" + (order.itemCount ?? order.items.reduce((s, i) => s + i.quantity, 0)) + " items): " + formatPrice(order.subtotal));
+    }
+    if (order.discountAmount != null && order.discountAmount > 0) {
+      lines.push("Bulk discount (" + Math.round((order.discountRate ?? 0) * 100) + "%): -" + formatPrice(order.discountAmount));
+    }
+
     lines.push(
       "Name: " + order.name,
       "Phone: " + order.phone,
@@ -129,6 +140,22 @@ export default function ConfirmationPage() {
                 <span className="text-sm text-slate-500">Delivery location</span>
                 <b className="text-right">{order.location}</b>
               </div>
+              {order.subtotal != null && (
+                <div className="mt-4 flex justify-between gap-4">
+                  <span className="text-sm text-slate-500">
+                    Subtotal ({order.itemCount ?? order.items.reduce((s, i) => s + i.quantity, 0)} items)
+                  </span>
+                  <b className="text-right">{formatPrice(order.subtotal)}</b>
+                </div>
+              )}
+              {order.discountAmount != null && order.discountAmount > 0 && (
+                <div className="mt-4 flex justify-between gap-4">
+                  <span className="text-sm font-bold text-green-700">
+                    Bulk discount ({Math.round((order.discountRate ?? 0) * 100)}% off)
+                  </span>
+                  <b className="text-right text-green-700">-{formatPrice(order.discountAmount)}</b>
+                </div>
+              )}
               <div className="mt-4 flex justify-between gap-4">
                 <span className="text-sm text-slate-500">Total</span>
                 <b className="text-right">{formatPrice(order.total)}</b>

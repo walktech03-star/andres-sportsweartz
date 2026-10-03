@@ -358,3 +358,96 @@ export async function updateSettings(formData: FormData) {
   revalidatePath("/shop");
   redirect("/admin/settings?saved=1");
 }
+
+function slugCode(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+const QR_SEGMENT_VALUES = ["general", "schools", "football", "whatsapp", "product", "custom"];
+
+export async function createQrCampaign(formData: FormData) {
+  await requireAdminAction();
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase) redirect("/admin/qr?error=not_configured");
+
+  const code = slugCode(text(formData, "code", 60));
+  const name = text(formData, "name", 120);
+  const rawSegment = text(formData, "segment", 20);
+  const segment = QR_SEGMENT_VALUES.includes(rawSegment) ? rawSegment : "custom";
+  const rawTarget = text(formData, "target_path", 200) || "/shop";
+  const targetPath = rawTarget.startsWith("/") ? rawTarget : "/shop";
+  const description = text(formData, "description", 300) || null;
+
+  if (!code || !name) redirect("/admin/qr?error=invalid");
+
+  // Auto-link product_<slug> codes to their product page for convenience.
+  let productSlug: string | null = null;
+  if (code.startsWith("product-")) {
+    productSlug = code.slice("product-".length) || null;
+  }
+
+  const { error } = await supabase.from("qr_campaigns").insert({
+    code,
+    name,
+    segment,
+    target_path: targetPath,
+    product_slug: productSlug,
+    description,
+    is_active: true,
+  });
+
+  if (error) {
+    console.error("Could not create QR campaign:", error);
+    redirect("/admin/qr?error=save_failed");
+  }
+
+  revalidatePath("/admin/qr");
+  redirect("/admin/qr?created=1");
+}
+
+export async function toggleQrCampaign(formData: FormData) {
+  await requireAdminAction();
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase) redirect("/admin/qr?error=not_configured");
+
+  const code = slugCode(text(formData, "code", 60));
+  const isActive = text(formData, "is_active", 10) === "true";
+  if (!code) redirect("/admin/qr?error=invalid");
+
+  const { error } = await supabase.from("qr_campaigns").update({ is_active: isActive }).eq("code", code);
+
+  if (error) {
+    console.error("Could not update QR campaign:", error);
+    redirect("/admin/qr?error=save_failed");
+  }
+
+  revalidatePath("/admin/qr");
+  redirect("/admin/qr?updated=1");
+}
+
+export async function deleteQrCampaign(formData: FormData) {
+  await requireAdminAction();
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase) redirect("/admin/qr?error=not_configured");
+
+  const code = slugCode(text(formData, "code", 60));
+  if (!code) redirect("/admin/qr?error=invalid");
+
+  const { error } = await supabase.from("qr_campaigns").delete().eq("code", code);
+
+  if (error) {
+    console.error("Could not delete QR campaign:", error);
+    redirect("/admin/qr?error=save_failed");
+  }
+
+  revalidatePath("/admin/qr");
+  redirect("/admin/qr?deleted=1");
+}
